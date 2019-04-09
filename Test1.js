@@ -23,7 +23,7 @@ test.describe('Automated smoke testing', function() {
 
     test.after(function() {
         this.timeout(8000);
-        //driver.quit();
+        driver.quit();
     });
 
     test.it('Авторизация', function() {
@@ -51,25 +51,25 @@ test.describe('Automated smoke testing', function() {
         driver.findElement(By.xpath("//*[contains(text(), 'Сохранить')]")).click();
     });
 
-    // test.it('Открыть/скрыть List', function() {
-    //     this.timeout(40000);
+    test.it('Открыть/скрыть List', function() {
+        this.timeout(40000);
 
-    //     let closeListButton = driver.findElement(By.xpath("//aside[2]/div"));
-    //     //Сравнение стандартного размера недельного календаря        
-    //     driver.findElement(By.xpath("//div[@class='index-ws']")).getCssValue("left")
-    //     .then(weekCalendarWidth => {
-    //         assert.equal(weekCalendarWidth, "660px");    
-    //     });
-    //     closeListButton.click();
-    //     //Сравнение размера недельного календаря при закрытом List'е
-    //     driver.findElement(By.xpath("//div[@class='index-ws']")).getCssValue("left")
-    //     .then(weekCalendarWidth => {
-    //        assert.equal(weekCalendarWidth, "268px");    
-    //     });
-    //     closeListButton.click();
-    //     //Отображение записей в List'e
-    //     driver.findElement(By.xpath("//div[@class='drag-source']/div"));
-    // });
+        let closeListButton = driver.findElement(By.xpath("//aside[2]/div"));
+        //Сравнение стандартного размера недельного календаря        
+        driver.findElement(By.xpath("//div[@class='index-ws']")).getCssValue("left")
+        .then(weekCalendarWidth => {
+            assert.equal(weekCalendarWidth, "660px");    
+        });
+        closeListButton.click();
+        //Сравнение размера недельного календаря при закрытом List'е
+        driver.findElement(By.xpath("//div[@class='index-ws']")).getCssValue("left")
+        .then(weekCalendarWidth => {
+           assert.equal(weekCalendarWidth, "268px");    
+        });
+        closeListButton.click();
+        //Отображение записей в List'e
+        driver.findElement(By.xpath("//div[@class='drag-source']/div"));
+    });
 
     test.it('Создание записей через Menu', function() {
         this.timeout(40000);
@@ -89,6 +89,32 @@ test.describe('Automated smoke testing', function() {
             .then(eventArrow => {
                 assert.equal(eventArrow, expectedEventArrow)
             });
+             //Проверка цвета текста в превью записи
+            driver.findElement(By.xpath("//div[@class='drag-source']//p[text()='" + entryText + "']/../..")).getCssValue("color")
+            .then(textColor => {
+                assert.equal(textColor, "rgba(47, 146, 138, 1)");
+            });
+            //Проверка цвета eventArrow
+            driver.findElement(By.xpath("//div[@class='drag-source']//p[text()='" + entryText + "']/../../../../div[@data-event-editor-info]/div[1]")).getAttribute('class')
+            .then(beforeEventArrow => {
+                assert.equal(beforeEventArrow, "event-label-before color-0 future");
+            });
+            driver.findElement(By.xpath("//div[@class='drag-source']//p[text()='" + entryText + "']/../../../../div[@data-event-editor-info]/div[2]")).getAttribute('class')
+            .then(backgroundEventArrow => {
+                assert.equal(backgroundEventArrow, "event-label-background color-0 future");
+            });
+            driver.findElement(By.xpath("//div[@class='drag-source']//p[text()='" + entryText + "']/../../../../div[@data-event-editor-info]/div[3]")).getAttribute('class')
+            .then(afterEventArrow => {
+                assert.equal(afterEventArrow, "event-label-after color-0 future");
+            });
+            //Переход к блоку события в недельном календаре через eventArrow
+            driver.findElement(By.xpath("//div[@class='drag-source']//p[text()='" + entryText + "']/../../../../div[@data-event-editor-info]//div[5]")).click();
+            driver.sleep(4000);
+            //Проверка цвета блока события
+            driver.findElement(By.xpath("//div[@class='daysContainer']/div[5]/div[1]/div[1]/div[2]")).getCssValue("background-color")
+            .then(eventBlockColor => {
+                assert.equal(eventBlockColor, "rgba(47, 146, 138, 1)");
+            });
         }
         
         entryCreate('Событие 21 марта');
@@ -97,233 +123,233 @@ test.describe('Automated smoke testing', function() {
         checkEntryCreate('Событие 20 марта', '20 марта 2020 г.\n09:00 - 09:30');
     });
 
-    // test.it("Открытие контекстного редактора записи в List'е", function() {
-    //     this.timeout(40000);
-    //     //Высота первой записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]")).getCssValue("height")
-    //     .then(entryHeight => {
-    //         assert.equal(entryHeight, "128px");
-    //     });
-    //     //Положение второй записи в List'е
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][2]")).getCssValue("top")
-    //     .then(entryHeight => {
-    //         assert.equal(entryHeight, "178px");
-    //     });
-    //     driver.findElement(By.xpath("//p[text()='Событие 21 марта']")).click();
-    //     driver.sleep(2000);
-    //     //Высота первой записи в открытом контекстном редакторе
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]")).getCssValue("height")
-    //     .then(entryHeight => {
-    //         assert.equal(entryHeight, "158px");
-    //     });
-    //     //Положение второй записи в List'е при открытом контекстном редакторе первой записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][2]")).getCssValue("top")
-    //     .then(entryTop => {
-    //         assert.equal(entryTop, "208px");
-    //     });
-    //     driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();    
-    // });
+    test.it("Открытие контекстного редактора записи в List'е", function() {
+        this.timeout(40000);
+        //Высота первой записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]")).getCssValue("height")
+        .then(entryHeight => {
+            assert.equal(entryHeight, "128px");
+        });
+        //Положение второй записи в List'е
+        driver.findElement(By.xpath("//div[@class='drag-source'][2]")).getCssValue("top")
+        .then(entryHeight => {
+            assert.equal(entryHeight, "178px");
+        });
+        driver.findElement(By.xpath("//p[text()='Событие 21 марта']")).click();
+        driver.sleep(2000);
+        //Высота первой записи в открытом контекстном редакторе
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]")).getCssValue("height")
+        .then(entryHeight => {
+            assert.equal(entryHeight, "158px");
+        });
+        //Положение второй записи в List'е при открытом контекстном редакторе первой записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][2]")).getCssValue("top")
+        .then(entryTop => {
+            assert.equal(entryTop, "208px");
+        });
+        driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();    
+    });
 
-    // test.it('Жирный текст в контекстном редакторе', function() {
-    //     this.timeout(40000);
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
-    //     driver.findElement(By.xpath("//button[@title='BOLD']")).then(boldButton => {
-    //         boldButton.click();
-    //         driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Bold Text');
-    //         driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();    
-    //     });
-    //     //Проверка жирного текста в записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//strong")).getText()
-    //     .then(boldText => {
-    //         assert.equal(boldText, " Bold Text")
-    //     });
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
-    //     //Удаление жирного текста
-    //     driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
-    // });
+    test.it('Жирный текст в контекстном редакторе', function() {
+        this.timeout(40000);
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
+        driver.findElement(By.xpath("//button[@title='BOLD']")).then(boldButton => {
+            boldButton.click();
+            driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Bold Text');
+            driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();    
+        });
+        //Проверка жирного текста в записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//strong")).getText()
+        .then(boldText => {
+            assert.equal(boldText, " Bold Text")
+        });
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
+        //Удаление жирного текста
+        driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
+    });
 
-    // test.it('Курсивный текст в контекстном редакторе', function() {
-    //     this.timeout(40000);
-    //     driver.findElement(By.xpath("//button[@title='ITALIC']")).then(italicButton => {
-    //         italicButton.click();
-    //         driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Italic Text');
-    //         driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
-    //     });
-    //     //Проверка курсива в записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//em")).getText()
-    //     .then(italicText => {
-    //         assert.equal(italicText, " Italic Text")
-    //     });
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
-    //     //Удаление курсивного текста
-    //     driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
-    // });
+    test.it('Курсивный текст в контекстном редакторе', function() {
+        this.timeout(40000);
+        driver.findElement(By.xpath("//button[@title='ITALIC']")).then(italicButton => {
+            italicButton.click();
+            driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Italic Text');
+            driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
+        });
+        //Проверка курсива в записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//em")).getText()
+        .then(italicText => {
+            assert.equal(italicText, " Italic Text")
+        });
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
+        //Удаление курсивного текста
+        driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
+    });
 
-    // test.it('Подчеркнутый текст в контекстном редакторе', function() {
-    //     this.timeout(40000);
-    //     driver.findElement(By.xpath("//button[@title='UNDERLINE']")).then(underlineButton => {
-    //         underlineButton.click();
-    //         driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Underline Text');
-    //         driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
-    //     });
-    //     //Проверка подчеркнутого текста в записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//ins")).getText()
-    //     .then(underlineText => {
-    //         assert.equal(underlineText, " Underline Text")
-    //     });
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
-    //     //Удаление подчеркнутого текста
-    //     driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
+    test.it('Подчеркнутый текст в контекстном редакторе', function() {
+        this.timeout(40000);
+        driver.findElement(By.xpath("//button[@title='UNDERLINE']")).then(underlineButton => {
+            underlineButton.click();
+            driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(' Underline Text');
+            driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
+        });
+        //Проверка подчеркнутого текста в записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//ins")).getText()
+        .then(underlineText => {
+            assert.equal(underlineText, " Underline Text")
+        });
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//p[text()]")).click();
+        //Удаление подчеркнутого текста
+        driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.DELETE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
         
-    // });
+    });
 
-    // test.it('Чек-лист в контекстном редакторе', function() {
-    //     this.timeout(40000);
-    //     driver.findElement(By.xpath("//button[@title='list-item-checked']")).then((checklistButton) => {
-    //         checklistButton.click();
-    //         driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys('\nВторая задача\nТретья задача\nЧетвертая задача');
-    //         driver.findElement(By.xpath("//div[@data-contents='true']//div[1]//div[1]//span[1]//input[1]")).click();
-    //         driver.findElement(By.xpath("//div[@data-contents='true']//div[3]//div[1]//span[1]//input[1]")).click();
-    //         driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
-    //     });
-    //     //Проверка, выполненные ли первая и третья задачи
-    //     driver.findElement(By.xpath("//span[text()='Событие 21 марта']")).getAttribute('class')
-    //     .then(textClass => {
-    //         assert.equal(textClass, "check-box-done");
-    //     });
-    //     driver.findElement(By.xpath("//span[text()='Третья задача']")).getAttribute('class')
-    //     .then(textClass => {
-    //         assert.equal(textClass, "check-box-done");
-    //     });
-    //     //Проверка, невыполненные ли вторая и четвертая задачи
-    //     driver.findElement(By.xpath("//span[text()='Вторая задача']")).getAttribute('class')
-    //     .then(textClass => {
-    //         assert.equal(textClass, "check-box-undone");
-    //     });
-    //     driver.findElement(By.xpath("//span[text()='Четвертая задача']")).getAttribute('class')
-    //     .then(textClass => {
-    //         assert.equal(textClass, "check-box-undone");
-    //     });
-    // });
+    test.it('Чек-лист в контекстном редакторе', function() {
+        this.timeout(40000);
+        driver.findElement(By.xpath("//button[@title='list-item-checked']")).then((checklistButton) => {
+            checklistButton.click();
+            driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys('\nВторая задача\nТретья задача\nЧетвертая задача');
+            driver.findElement(By.xpath("//div[@data-contents='true']//div[1]//div[1]//span[1]//input[1]")).click();
+            driver.findElement(By.xpath("//div[@data-contents='true']//div[3]//div[1]//span[1]//input[1]")).click();
+            driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
+        });
+        //Проверка, выполненные ли первая и третья задачи
+        driver.findElement(By.xpath("//span[text()='Событие 21 марта']")).getAttribute('class')
+        .then(textClass => {
+            assert.equal(textClass, "check-box-done");
+        });
+        driver.findElement(By.xpath("//span[text()='Третья задача']")).getAttribute('class')
+        .then(textClass => {
+            assert.equal(textClass, "check-box-done");
+        });
+        //Проверка, невыполненные ли вторая и четвертая задачи
+        driver.findElement(By.xpath("//span[text()='Вторая задача']")).getAttribute('class')
+        .then(textClass => {
+            assert.equal(textClass, "check-box-undone");
+        });
+        driver.findElement(By.xpath("//span[text()='Четвертая задача']")).getAttribute('class')
+        .then(textClass => {
+            assert.equal(textClass, "check-box-undone");
+        });
+    });
 
-    // test.it('Скрытие/отображение выполненных задач', function() {
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//ul[@class='checklist']/li[4]")).click();
-    //     //Скрытие выполненных задач
-    //     driver.findElement(By.xpath("//h6")).click();
-    //     //Провера на текст в шапке
-    //     driver.findElement(By.xpath("//h6")).getAttribute("content")
-    //     .then(headerText => {
-    //         assert.equal(headerText, "\\25b8  Сделать: 2 / 4 сделано");
-    //     });
-    //     //Провера на число отображаемых задач
-    //     driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//section[@class='sc-brqgnP gFbSXS']/div/div/div"))
-    //     .then(checkList => {
-    //         assert.equal(checkList.length, "2");
-    //     });
-    //     driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
+    test.it('Скрытие/отображение выполненных задач', function() {
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//ul[@class='checklist']/li[4]")).click();
+        //Скрытие выполненных задач
+        driver.findElement(By.xpath("//h6")).click();
+        //Провера на текст в шапке
+        driver.findElement(By.xpath("//h6")).getAttribute("content")
+        .then(headerText => {
+            assert.equal(headerText, "\\25b8  Сделать: 2 / 4 сделано");
+        });
+        //Провера на число отображаемых задач
+        driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//section[@class='sc-brqgnP gFbSXS']/div/div/div"))
+        .then(checkList => {
+            assert.equal(checkList.length, "2");
+        });
+        driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
 
-    //     //Провера, невыполненные ли первая и вторая задачи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//ul[@class='checklist']/li[1]/span")).getAttribute("class")
-    //     .then(task => {
-    //         assert.equal(task, "check-box-undone");
-    //     });
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//ul[@class='checklist']/li[2]/span")).getAttribute("class")
-    //     .then(task => {
-    //         assert.equal(task, "check-box-undone");
-    //     });
-    //     //Открытие контекстного редактора
-    //     driver.findElement(By.xpath("//ul[@class='checklist']/li[2]")).click();
-    //     //Отмена скрытия выполненных задач
-    //     driver.findElement(By.xpath("//h6")).click();
-    //     //Провера на число отображаемых задач
-    //     driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//section[@class='sc-brqgnP gFbSXS']/div/div/div"))
-    //     .then(checkList => {
-    //         assert.equal(checkList.length, "4");
-    //     });
-    // });
+        //Провера, невыполненные ли первая и вторая задачи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//ul[@class='checklist']/li[1]/span")).getAttribute("class")
+        .then(task => {
+            assert.equal(task, "check-box-undone");
+        });
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//ul[@class='checklist']/li[2]/span")).getAttribute("class")
+        .then(task => {
+            assert.equal(task, "check-box-undone");
+        });
+        //Открытие контекстного редактора
+        driver.findElement(By.xpath("//ul[@class='checklist']/li[2]")).click();
+        //Отмена скрытия выполненных задач
+        driver.findElement(By.xpath("//h6")).click();
+        //Провера на число отображаемых задач
+        driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//section[@class='sc-brqgnP gFbSXS']/div/div/div"))
+        .then(checkList => {
+            assert.equal(checkList.length, "4");
+        });
+    });
     
-    // test.it('Удаление задач в чек-листе', function() {
-    //     this.timeout(40000);
-    //     //Установить курсор на конец четвертой задачи
-    //     driver.findElement(By.xpath("//section[@class='sc-brqgnP gFbSXS']/div[4]/div/div")).click();
-    //     //Удаление четвертой задачи через удаление текста
-    //     driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
-    //     //Проверка на текст в шапке
-    //     driver.findElement(By.xpath("//h6")).getAttribute("content")
-    //     .then(headerText => {
-    //         assert.equal(headerText, "\\25be  Сделать: 2 / 3 сделано");
-    //     });
-    //     //Удаление третьей задачи через кнопку удаления
-    //     driver.findElement(By.xpath("//div[3]/div/span[@class='sc-cvbbAY fbjzgb']/button[@class='sc-hSdWYo cNHIZT']")).click();
-    //     //Проверка количества оставшихся задач по числу чек-боксов
-    //     driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']/..//input"))
-    //     .then(checkboxNumber => {
-    //         assert.equal(checkboxNumber.length, 2);
-    //     });
-    //     //Удаление второй задачи через кнопку удаления
-    //     driver.findElement(By.xpath("//div[2]/div/span[@class='sc-cvbbAY fbjzgb']/button[@class='sc-hSdWYo cNHIZT']")).click();
-    //     //Проверка на оставшийся в чек-листе текст
-    //     driver.findElement(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']/..//section")).getText()
-    //     .then(checklistText => {
-    //         assert.equal(checklistText, "Событие 21 марта");
-    //     });
-    //     //Сделать задачу обычной строкой кликом по кнопке создания чек-листа
-    //     driver.findElement(By.xpath("//button[@title='list-item-checked']")).click();
-    //     //Проверка текста вне чек-листа
-    //     driver.findElement(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//div[@class='notranslate public-DraftEditor-content']/div/div/div")).getText()
-    //     .then(entryText => {
-    //         assert.equal(entryText, "Событие 21 марта");
-    //     })
-    //     driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
+    test.it('Удаление задач в чек-листе', function() {
+        this.timeout(40000);
+        //Установить курсор на конец четвертой задачи
+        driver.findElement(By.xpath("//section[@class='sc-brqgnP gFbSXS']/div[4]/div/div")).click();
+        //Удаление четвертой задачи через удаление текста
+        driver.findElement(By.xpath("//div[@class='notranslate public-DraftEditor-content']")).sendKeys(Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE, Key.BACK_SPACE);
+        //Проверка на текст в шапке
+        driver.findElement(By.xpath("//h6")).getAttribute("content")
+        .then(headerText => {
+            assert.equal(headerText, "\\25be  Сделать: 2 / 3 сделано");
+        });
+        //Удаление третьей задачи через кнопку удаления
+        driver.findElement(By.xpath("//div[3]/div/span[@class='sc-cvbbAY fbjzgb']/button[@class='sc-hSdWYo cNHIZT']")).click();
+        //Проверка количества оставшихся задач по числу чек-боксов
+        driver.findElements(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']/..//input"))
+        .then(checkboxNumber => {
+            assert.equal(checkboxNumber.length, 2);
+        });
+        //Удаление второй задачи через кнопку удаления
+        driver.findElement(By.xpath("//div[2]/div/span[@class='sc-cvbbAY fbjzgb']/button[@class='sc-hSdWYo cNHIZT']")).click();
+        //Проверка на оставшийся в чек-листе текст
+        driver.findElement(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']/..//section")).getText()
+        .then(checklistText => {
+            assert.equal(checklistText, "Событие 21 марта");
+        });
+        //Сделать задачу обычной строкой кликом по кнопке создания чек-листа
+        driver.findElement(By.xpath("//button[@title='list-item-checked']")).click();
+        //Проверка текста вне чек-листа
+        driver.findElement(By.xpath("//div[@class='thin-scrollbar sc-gPEVay jBbMDo']//div[@class='notranslate public-DraftEditor-content']/div/div/div")).getText()
+        .then(entryText => {
+            assert.equal(entryText, "Событие 21 марта");
+        })
+        driver.findElement(By.xpath("//*[contains(text(), 'Готово')]")).click();
 
-    //     //Проверка текста вне чек-листа в превью записи
-    //     driver.findElement(By.xpath("//div[@class='drag-source'][1]//p")).getText()
-    //     .then(entryText => {
-    //         assert.equal(entryText, "Событие 21 марта");
-    //     })
-    // });
+        //Проверка текста вне чек-листа в превью записи
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//p")).getText()
+        .then(entryText => {
+            assert.equal(entryText, "Событие 21 марта");
+        })
+    });
 
-    // test.it("Открытие EntryEditor'а через превью записи в List'е", function() {
-    //     this.timeout(40000);
-    //     //Проверки открытия EntryEditor'а
-    //     function checkOpenEntry(expectedEventArrow, expectedEntryText) {
-    //         //Проверка даты события
-    //         driver.findElement(By.xpath("//div[@class='row']//div[@data-event-editor-info]")).getText()
-    //         .then(function(actualEventArrow) {
-    //             assert.equal(actualEventArrow, expectedEventArrow);
-    //         });
-    //         //Проверка контента записи
-    //         driver.findElement(By.xpath("//div[@class='row']//div[@class='DraftEditor-root']")).getText()
-    //         .then(function(actualText) {
-    //             assert.equal(actualText, expectedEntryText);
-    //         });
-    //         //Проверка изменения URL 
-    //         driver.getCurrentUrl()
-    //         .then(currentUrl => {
-    //             assert.notEqual(currentUrl, "https://web.alpha.simplanum.com/");
-    //         });
-    //         driver.findElement(By.xpath("//*[contains(text(), 'Закрыть')]")).click();
-    //     }
+    test.it("Открытие EntryEditor'а через превью записи в List'е", function() {
+        this.timeout(40000);
+        //Проверки открытия EntryEditor'а
+        function checkOpenEntry(expectedEventArrow, expectedEntryText) {
+            //Проверка даты события
+            driver.findElement(By.xpath("//div[@class='row']//div[@data-event-editor-info]")).getText()
+            .then(function(actualEventArrow) {
+                assert.equal(actualEventArrow, expectedEventArrow);
+            });
+            //Проверка контента записи
+            driver.findElement(By.xpath("//div[@class='row']//div[@class='DraftEditor-root']")).getText()
+            .then(function(actualText) {
+                assert.equal(actualText, expectedEntryText);
+            });
+            //Проверка изменения URL 
+            driver.getCurrentUrl()
+            .then(currentUrl => {
+                assert.notEqual(currentUrl, "https://web.alpha.simplanum.com/");
+            });
+            driver.findElement(By.xpath("//*[contains(text(), 'Закрыть')]")).click();
+        }
         
-    //     //Открытие первой записи List'а через кнопку в превью
-    //     let entryOpenButton = driver.findElement(By.xpath("//div[@class='drag-source'][1]/div/div[1]"));
-    //     driver.actions()
-    //           .mouseMove(entryOpenButton)
-    //           .click()
-    //           .perform();
-    //     checkOpenEntry('21 марта 2020 г.\n09:00 - 09:30', 'Событие 21 марта');
-    //     //Открытие записи второй записи List'а даблкликом
-    //     let entryContent = driver.findElement(By.xpath("//div[@class='drag-source'][2]/div/div[3]"));
-    //     driver.actions()
-    //           .doubleClick(entryContent)
-    //           .perform();
-    //     checkOpenEntry('20 марта 2020 г.\n09:00 - 09:30', 'Событие 20 марта');
-    // });
+        //Открытие первой записи List'а через кнопку в превью
+        let entryOpenButton = driver.findElement(By.xpath("//div[@class='drag-source'][1]/div/div[1]"));
+        driver.actions()
+              .mouseMove(entryOpenButton)
+              .click()
+              .perform();
+        checkOpenEntry('21 марта 2020 г.\n09:00 - 09:30', 'Событие 21 марта');
+        //Открытие записи второй записи List'а даблкликом
+        let entryContent = driver.findElement(By.xpath("//div[@class='drag-source'][2]/div/div[3]"));
+        driver.actions()
+              .doubleClick(entryContent)
+              .perform();
+        checkOpenEntry('20 марта 2020 г.\n09:00 - 09:30', 'Событие 20 марта');
+    });
 
     test.it("Отметить запись выполненной", function() {
         this.timeout(40000);
@@ -406,12 +432,13 @@ test.describe('Automated smoke testing', function() {
 
     test.it("Выбор цветовой схемы записи", function() {
         this.timeout(40000);
-        let colorArr = ['#2f928a', '#f0580d', '#fc321d', '#7466a8', '#ffab09', '#a27f5f', '#155588', '#e9435b', '#88b12d', '#adadad'];
+        let colorArr = [undefined ,'rgba(47, 146, 138, 1)', 'rgba(240, 88, 13, 1)', 'rgba(252, 50, 29, 1)', 'rgba(116, 102, 168, 1)', 'rgba(255, 171, 9, 1)', 'rgba(162, 127, 95, 1)', 'rgba(21, 85, 136, 1)', 'rgba(233, 67, 91, 1)', 'rgba(136, 177, 45, 1)', 'rgba(173, 173, 173, 1)'];
 
         //Переход к блоку первого события в недельном календаре через eventArrow
         driver.findElement(By.xpath("//div[@class='drag-source'][1]//div/div/div[5]")).click();
+        driver.sleep(4000);
 
-        for(let colorNum = 1; colorNum < colorArr.length; colorNum++) {
+        for(let colorNum = colorArr.length - 1; colorNum > 0; colorNum--) {
             //Открытие контекстного редактора
             driver.findElement(By.xpath("//div[@class='drag-source'][1]//p")).click();
             //Нажать кнопку "Выбрать цветовую схему"
@@ -436,18 +463,163 @@ test.describe('Automated smoke testing', function() {
                 assert.equal(textColor, colorArr[colorNum]);
             });
             //Проверка цвета eventArrow
-            driver.findElements(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div"))
-            .then(partsEventArrow => {
-                assert.equal(partsEventArrow[0].getAttribute('class'), "event-label-before color-" + colorNum + " future");
-                assert.equal(partsEventArrow[1].getAttribute('class'), "event-label-background color-" + colorNum + " future");
-                assert.equal(partsEventArrow[2].getAttribute('class'), "event-label-after color-" + colorNum + " future");
+            driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div[1]")).getAttribute('class')
+            .then(beforeEventArrow => {
+                assert.equal(beforeEventArrow, "event-label-before color-" + (colorNum - 1) + " future");
+            });
+            driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div[2]")).getAttribute('class')
+            .then(backgroundEventArrow => {
+                assert.equal(backgroundEventArrow, "event-label-background color-" + (colorNum - 1) + " future");
+            });
+            driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div[3]")).getAttribute('class')
+            .then(afterEventArrow => {
+                assert.equal(afterEventArrow, "event-label-after color-" + (colorNum - 1) + " future");
             });
             //Проверка цвета блока события
             driver.findElement(By.xpath("//div[@class='daysContainer']/div[5]/div[1]/div[1]/div[2]")).getCssValue("background-color")
             .then(eventBlockColor => {
-                assert.equal(eventBlockColor, colorArr[colorNum])
+                assert.equal(eventBlockColor, colorArr[colorNum]);
             });
-        } 
+        }
+    });
+
+    test.it("Переход к блоку события в недельном календаре через eventArrow", function() {
+        this.timeout(40000);
+        //Переход к блоку первого события в недельном календаре через eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//div/div/div[5]")).click();
+        //Проверка подсветки блока события
+        driver.findElement(By.xpath("//div[@class='daysContainer']/div[5]/div[1]/div[1]/div[2]")).getAttribute("class")
+        .then(eventBlockColor => {
+            assert.equal(eventBlockColor, "wcalevent st-1  highlighted   color-0 et-n sync-200")
+        });
+        driver.sleep(4000);
+        //Проверка отключения подсветки блока события
+        driver.findElement(By.xpath("//div[@class='daysContainer']/div[5]/div[1]/div[1]/div[2]")).getAttribute("class")
+        .then(eventBlockColor => {
+            assert.equal(eventBlockColor, "wcalevent st-1     color-0 et-n sync-200")
+        });
+        //Проверка текста и времени блока события
+        driver.findElement(By.xpath("//div[@class='daysContainer']/div[5]/div[1]/div[1]/div[2]")).getText()
+        .then(eventBlockText => {
+            assert.equal(eventBlockText, "Событие 21 марта\n09:00")
+        });
+    });
+
+    test.it("Открытие месячного календаря в eventArrow", function() {
+        this.timeout(40000);
+        //Открытие месячного календаря через eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div/div[2]")).click();
+        //Проверка на то, что календарь открылся
+        driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']")).getText()
+        .then(tinyCalText => {
+            assert.equal(tinyCalText, "March 2020\nMo Tu We Th Fr Sa Su\n24\n25\n26\n27\n28\n29\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n1\n2\n3\n4\n5")
+        });
+        //Проверка на отображение даты текущего события в календаре
+        driver.findElement(By.xpath("//div[@aria-label='Sat Mar 21 2020']")).getAttribute("class")
+        .then(currentDate => {
+            assert.equal(currentDate, "DayPicker-Day DayPicker-Day--selected")
+        });
+        //Проверка на цвет даты, на которую наведён курсор
+        driver.actions()
+              .mouseMove(driver.findElement(By.xpath("//div[@aria-label='Sun Mar 08 2020']//span[text()='8']")))
+              .perform();
+        driver.findElement(By.xpath("//div[@aria-label='Sun Mar 08 2020']//span[text()='8']")).getCssValue("background-color")
+        .then(markedDayColor => {
+          assert.equal(markedDayColor, "rgba(203, 203, 203, 0.44)");
+        });
+        //Проверка на цвет даты вне курсора
+        driver.findElement(By.xpath("//div[@aria-label='Sat Mar 07 2020']//span[text()='7']")).getCssValue("background-color")
+        .then(markedDayColor => {
+          assert.equal(markedDayColor, "rgba(0, 0, 0, 0)");
+        });
+        //Закрытие месячного календаря, уведя курсор в другую область
+        driver.findElement(By.xpath("//div[@class='hide-scrollbar']/div/div[1]")).click();
+        //Ожидание закрытия календаря
+        let tinyCal = driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']/.."));            
+        driver.wait(until.stalenessOf(tinyCal) , 5000);
+    });
+
+    test.it("Изменение даты события на будущую через месячный календарь в eventArrow", function() {
+        this.timeout(40000);
+        let monthsArr = ['April 2020', 'May 2020', 'June 2020', 'July 2020'];
+
+        //Открытие месячного календаря через eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div/div[2]")).click();
+        //Перелистывание месяцев календаря
+        for(let monthNum = 0; monthNum < monthsArr.length; monthNum++) {
+            driver.findElement(By.xpath("//span[@aria-label='Next Month']")).click();
+            driver.findElement(By.xpath("//div[@class='DayPicker-Caption']/div")).getText()
+            .then(date => {
+                assert.equal(date, monthsArr[monthNum])
+            });
+        }
+        //Выбор новой даты события 'December 2019', 'January 2020', 'February 2020', 'March 2020', 
+        driver.findElement(By.xpath("//div[@aria-label='Thu Jul 09 2020']//span[text()='9']")).click();
+        //Ожидание закрытия календаря после сохранения
+        let tinyCal = driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']/.."));
+        driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']/../button[text()='Сохранить']")).click(); 
+        driver.wait(until.stalenessOf(tinyCal) , 5000);
+        //Проверка даты в eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][1]//div[@data-event-editor-info]/div/div[2]")).getText()
+        .then(eventArrowDate => {
+            assert.equal(eventArrowDate, "09 июля 2020 г.");
+        });
+    });
+
+    test.it("Изменение даты события на прошедшую через месячный календарь в eventArrow", function() {
+        this.timeout(40000);
+        let monthsArr = ['February 2020', 'January 2020', 'December 2019'];
+        
+        //Открытие месячного календаря через eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][2]//div[@data-event-editor-info]/div/div[2]")).click();
+        //Перелистывание месяцев календаря
+        for(let monthNum = 0; monthNum < monthsArr.length; monthNum++) {
+            driver.findElement(By.xpath("//span[@aria-label='Previous Month']")).click();
+            driver.findElement(By.xpath("//div[@class='DayPicker-Caption']/div")).getText()
+            .then(date => {
+                assert.equal(date, monthsArr[monthNum])
+            });
+        }
+        //Выбор новой даты события  
+        driver.findElement(By.xpath("//div[@aria-label='Sun Dec 01 2019']//span[text()='1']")).click();
+        //Ожидание закрытия календаря после сохранения
+        let tinyCal = driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']/.."));
+        driver.findElement(By.xpath("//div[@class='DayPicker tiny-calendar']/../button[text()='Сохранить']")).click(); 
+        driver.wait(until.stalenessOf(tinyCal) , 5000);
+        //Проверка даты в eventArrow
+        driver.findElement(By.xpath("//div[@class='drag-source'][2]//div[@data-event-editor-info]/div/div[2]")).getText()
+        .then(eventArrowDate => {
+            assert.equal(eventArrowDate, "01 декабря 2019 г.");
+        });
+    });
+
+    test.it("Удаление записи через контекстный редактор", function() {
+        this.timeout(40000);
+        //Удаление первой записи в List'е num раз
+        function entryDelete(num) {
+            //Определение изначального числа записей
+            driver.findElements(By.xpath("//div[@class='drag-source']/div"))
+            .then(allEntries => {
+                for(let deletedEntries = 1; deletedEntries <= num; deletedEntries++) {
+                    //Открытие контекстного редактора
+                    driver.findElement(By.xpath("//div[@class='drag-source'][1]//p")).click();
+                    //Действия удаления первой записи List'а через контекстный редактор
+                    driver.actions()
+                          .click(driver.findElement(By.xpath("//div[text()='Готово']/../img[3]")))
+                          .perform();
+                    driver.actions()
+                          .click(driver.findElement(By.xpath("//div[@id='modal-content']//button[text()='Удалить']")))
+                          .perform();
+                    //Проверка на число отображаемых записей после удаления
+                    driver.findElements(By.xpath("//div[@class='drag-source']/div"))
+                    .then(actualEntries => {
+                        assert.equal(actualEntries.length, allEntries.length - deletedEntries);
+                    });
+                }
+            });
+        }
+        //Удаление первой записи
+        entryDelete(1);
     });
 
     test.it("Удаление записи через превью", function() {
@@ -476,9 +648,7 @@ test.describe('Automated smoke testing', function() {
                 }
             });
         }
-        //Удаление двух первых записей
-        entryDelete(2);
+        //Удаление первой записи
+        entryDelete(1);
     });
 });
-    
-    //driver.wait(webdriver.until.titleIs('webdriver - Google Search'), 1000).then(() => driver.quit());
